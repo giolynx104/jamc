@@ -1,0 +1,235 @@
+// schema.prisma
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+}
+
+enum AccessType {
+  FREE
+  PAID
+}
+
+enum FlaggedStatus {
+  SLOW_PROGRESS
+  FAST_PROGRESS
+  NORMAL
+}
+
+enum GroupType {
+  FASTER_LEARNERS
+  SLOWER_LEARNERS
+  MIXED
+}
+
+enum AchievementType {
+  CERTIFICATE
+  BADGE
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  teacherCourses  Course[]         @relation("TeacherCourses")
+  enrollments     Enrollment[]
+  progresses      Progress[]
+  creditPoints    CreditPoint?
+  ratings         Rating[]
+  questions       Question[]
+  groupMembers    GroupMember[]
+  certificates    Certificate[]
+  revenues        Revenue[]
+  questionUpvotes QuestionUpvote[]
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  rating      Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  teacher      User          @relation("TeacherCourses", fields: [teacherId], references: [id])
+  teacherId    Int
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+  progresses   Progress[]
+  ratings      Rating[]
+  certificates Certificate[]
+  revenues     Revenue[]
+}
+
+model Lesson {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  videoUrl  String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  course     Course     @relation(fields: [courseId], references: [id])
+  courseId   Int
+  progresses Progress[]
+  questions  Question[]
+}
+
+model Enrollment {
+  id         Int        @id @default(autoincrement())
+  accessType AccessType
+  status     String // e.g., PENDING, ACTIVE
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  // Relations
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId Int
+  course    Course @relation(fields: [courseId], references: [id])
+  courseId  Int
+
+  @@unique([studentId, courseId])
+}
+
+model Progress {
+  id               Int           @id @default(autoincrement())
+  lessonCompletion Boolean       @default(false)
+  quizResults      Json
+  flaggedStatus    FlaggedStatus @default(NORMAL)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relations
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId Int
+  course    Course @relation(fields: [courseId], references: [id])
+  courseId  Int
+  lesson    Lesson @relation(fields: [lessonId], references: [id])
+  lessonId  Int
+
+  @@unique([studentId, lessonId])
+}
+
+model Group {
+  id        Int       @id @default(autoincrement())
+  groupType GroupType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  groupMembers GroupMember[]
+}
+
+model GroupMember {
+  id Int @id @default(autoincrement())
+
+  // Relations
+  group     Group @relation(fields: [groupId], references: [id])
+  groupId   Int
+  student   User  @relation(fields: [studentId], references: [id])
+  studentId Int
+
+  @@unique([groupId, studentId])
+}
+
+model CreditPoint {
+  id              Int      @id @default(autoincrement())
+  pointsTotal     Int      @default(0)
+  pointsBreakdown Json
+  badgesEarned    Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  student   User @relation(fields: [studentId], references: [id])
+  studentId Int  @unique
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  review    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId Int
+  course    Course @relation(fields: [courseId], references: [id])
+  courseId  Int
+
+  @@unique([studentId, courseId])
+}
+
+model Question {
+  id            Int      @id @default(autoincrement())
+  content       String
+  priorityScore Float    @default(0)
+  upvoteCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  student   User             @relation(fields: [studentId], references: [id])
+  studentId Int
+  lesson    Lesson           @relation(fields: [lessonId], references: [id])
+  lessonId  Int
+  upvotes   QuestionUpvote[]
+}
+
+model QuestionUpvote {
+  id Int @id @default(autoincrement())
+
+  // Relations
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+
+  @@unique([questionId, userId])
+}
+
+model Certificate {
+  id          Int             @id @default(autoincrement())
+  achievement AchievementType
+  dateIssued  DateTime        @default(now())
+
+  // Relations
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId Int
+  course    Course @relation(fields: [courseId], references: [id])
+  courseId  Int
+}
+
+model Revenue {
+  id                Int      @id @default(autoincrement())
+  earnedAmount      Float    @default(0)
+  studentEnrollment Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  teacher   User   @relation(fields: [teacherId], references: [id])
+  teacherId Int
+  course    Course @relation(fields: [courseId], references: [id])
+  courseId  Int
+}
