@@ -1,99 +1,79 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { AlertCircle, Eye, EyeOff } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
-import { FaGoogle, FaFacebook, FaGithub } from 'react-icons/fa'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { PasswordField } from "@/components/password-field";
+import { OAuthSection } from "@/components/oauth-section";
 
 export function TeacherRegistrationComponent() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    schoolName: '',
-  })
-  const [error, setError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const router = useRouter()
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    schoolName: "",
+  });
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     try {
       // Here you would typically make an API call to register the teacher
       // For demonstration, we'll just simulate a successful registration
-      console.log('Teacher registration data:', formData)
-      router.push('/teacher-dashboard')
+      console.log("Teacher registration data:", formData);
+      router.push("/teacher-dashboard");
     } catch (err) {
-      console.error(err)
-      setError('Failed to register. Please try again.')
+      console.error(err);
+      setError("Failed to register. Please try again.");
     }
-  }
+  };
 
-  const handleOAuthSignIn = (provider: string) => {
+  const handleOAuthSignIn = (provider: "Google" | "Facebook" | "GitHub") => {
     // Here you would typically initiate the OAuth flow for the selected provider
-    console.log(`Initiating OAuth sign-in with ${provider}`)
+    console.log(`Initiating OAuth sign-in with ${provider}`);
     // For demonstration purposes, we'll just log the action
     // In a real application, you would redirect to the OAuth provider's authorization page
-  }
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword)
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Teacher Registration</CardTitle>
-          <CardDescription className="text-center">Join JAMC and start creating your classes</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">
+            Teacher Registration
+          </CardTitle>
+          <CardDescription className="text-center">
+            Join JAMC and start creating your classes
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <Button 
-              variant="outline" 
-              className="w-full flex items-center justify-center gap-2"
-              onClick={() => handleOAuthSignIn('Google')}
-            >
-              <FaGoogle /> Sign up with Google
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full flex items-center justify-center gap-2"
-              onClick={() => handleOAuthSignIn('Facebook')}
-            >
-              <FaFacebook /> Sign up with Facebook
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full flex items-center justify-center gap-2"
-              onClick={() => handleOAuthSignIn('GitHub')}
-            >
-              <FaGithub /> Sign up with GitHub
-            </Button>
-          </div>
+          <OAuthSection onSignIn={handleOAuthSignIn} />
 
           <div className="relative my-6">
             <Separator />
@@ -105,59 +85,47 @@ export function TeacherRegistrationComponent() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" name="name" type="text" required onChange={handleChange} />
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                required
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" name="email" type="email" required onChange={handleChange} />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                onChange={handleChange}
+              />
             </div>
-            <div className="relative">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input 
-                  id="password" 
-                  name="password" 
-                  type={showPassword ? "text" : "password"} 
-                  required 
-                  onChange={handleChange} 
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
-                <Input 
-                  id="confirmPassword" 
-                  name="confirmPassword" 
-                  type={showConfirmPassword ? "text" : "password"} 
-                  required 
-                  onChange={handleChange} 
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={toggleConfirmPasswordVisibility}
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
+            <PasswordField
+              id="password"
+              name="password"
+              label="Password"
+              required
+              onChange={handleChange}
+            />
+            <PasswordField
+              id="confirmPassword"
+              name="confirmPassword"
+              label="Confirm Password"
+              required
+              onChange={handleChange}
+            />
             <div>
               <Label htmlFor="schoolName">School Name</Label>
-              <Input id="schoolName" name="schoolName" type="text" required onChange={handleChange} />
+              <Input
+                id="schoolName"
+                name="schoolName"
+                type="text"
+                required
+                onChange={handleChange}
+              />
             </div>
             {error && (
               <Alert variant="destructive">
@@ -166,18 +134,24 @@ export function TeacherRegistrationComponent() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" className="w-full">Register</Button>
+            <Button type="submit" className="w-full">
+              Register
+            </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-            <Button variant="link" className="p-0" onClick={() => router.push('/login')}>
+            Already have an account?{" "}
+            <Button
+              variant="link"
+              className="p-0"
+              onClick={() => router.push("/login")}
+            >
               Log in
             </Button>
           </p>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
