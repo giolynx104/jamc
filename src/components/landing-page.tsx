@@ -29,10 +29,10 @@ export function LandingPageComponent() {
         </p>
         <div className="space-x-4">
           <Button size="lg" asChild>
-            <Link href="/register?role=teacher">I'm a Teacher</Link>
+            <Link href="/register/teacher">I&apos;m a Teacher</Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/register?role=student">I'm a Student</Link>
+            <Link href="/register/student">I&apos;m a Student</Link>
           </Button>
         </div>
       </main>
