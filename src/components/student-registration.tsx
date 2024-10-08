@@ -66,12 +66,6 @@ export function StudentRegistrationComponent() {
     }
   };
 
-  const handleOAuthSignIn = (provider: "Google" | "Facebook" | "GitHub") => {
-    // Here you would typically initiate the OAuth flow for the selected provider
-    console.log(`Initiating OAuth sign-in with ${provider}`);
-    // For demonstration purposes, we'll just log the action
-    // In a real application, you would redirect to the OAuth provider's authorization page
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -85,7 +79,7 @@ export function StudentRegistrationComponent() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <OAuthSection onSignIn={handleOAuthSignIn} />
+          <OAuthSection />
 
           <div className="relative my-6">
             <Separator />
@@ -179,7 +173,7 @@ export function StudentRegistrationComponent() {
             <Button
               variant="link"
               className="p-0"
-              onClick={() => router.push("/login")}
+              onClick={() => router.push("/signin")}
             >
               Log in
             </Button>

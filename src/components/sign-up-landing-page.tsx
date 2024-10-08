@@ -16,11 +16,6 @@ import { OAuthSection } from "@/components/oauth-section";
 export function SignUpLandingPage() {
   const router = useRouter();
 
-  const handleOAuthSignIn = (provider: "Google" | "Facebook" | "GitHub") => {
-    console.log(`Initiating OAuth sign-up with ${provider}`);
-    // Implement OAuth sign-up logic here
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
@@ -33,7 +28,7 @@ export function SignUpLandingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <OAuthSection onSignIn={handleOAuthSignIn} />
+          <OAuthSection />
 
           <div className="relative my-6">
             <Separator />
@@ -65,7 +60,7 @@ export function SignUpLandingPage() {
             <Button
               variant="link"
               className="p-0"
-              onClick={() => router.push("/login")}
+              onClick={() => router.push("/signin")}
             >
               Log in
             </Button>

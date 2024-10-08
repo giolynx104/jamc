@@ -10,7 +10,7 @@ export function LandingPageComponent() {
         <nav className="flex justify-between items-center">
           <div className="text-2xl font-bold text-blue-600">JAMC</div>
           <div className="space-x-4">
-            <Link href="/login" className="text-blue-600 hover:text-blue-800">Login</Link>
+            <Link href="/signin" className="text-blue-600 hover:text-blue-800">Login</Link>
             <Button asChild>
               <Link href="/register">Get Started</Link>
             </Button>
