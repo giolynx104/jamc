@@ -10,9 +10,13 @@ type OAuthProvider = "Google" | "Facebook" | "GitHub";
 
 interface OAuthButtonProps {
   provider: OAuthProvider;
+  action?: "Sign up" | "Sign in";
 }
 
-export function OAuthButton({ provider }: OAuthButtonProps) {
+export function OAuthButton({
+  provider,
+  action = "Sign up",
+}: OAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const icons = {
     Google: FaGoogle,
@@ -43,11 +47,11 @@ export function OAuthButton({ provider }: OAuthButtonProps) {
       {isLoading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Signing in...
+          {action === "Sign in" ? "Signing in..." : "Signing up..."}
         </>
       ) : (
         <>
-          <Icon /> Sign up with {provider}
+          <Icon /> {action} with {provider}
         </>
       )}
     </Button>
