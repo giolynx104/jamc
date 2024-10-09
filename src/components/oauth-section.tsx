@@ -1,11 +1,15 @@
 import { OAuthButton } from "@/components/oauth-button";
 
-export function OAuthSection() {
+interface OAuthSectionProps {
+  action?: "Sign up" | "Sign in";
+}
+
+export function OAuthSection({ action = "Sign up" }: OAuthSectionProps) {
   return (
     <div className="space-y-4">
-      <OAuthButton provider="Google" />
-      <OAuthButton provider="Facebook" />
-      <OAuthButton provider="GitHub" />
+      <OAuthButton provider="Google" action={action} />
+      <OAuthButton provider="Facebook" action={action} />
+      <OAuthButton provider="GitHub" action={action} />
     </div>
   );
 }

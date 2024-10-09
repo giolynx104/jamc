@@ -38,13 +38,13 @@ enum AchievementType {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   emailVerified DateTime?
   image         String?
 
@@ -59,21 +59,22 @@ model User {
   certificates    Certificate[]
   revenues        Revenue[]
   questionUpvotes QuestionUpvote[]
+  accounts        Account[]
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -89,7 +90,7 @@ model VerificationToken {
 }
 
 model Course {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(cuid())
   title       String
   description String
   rating      Float    @default(0)
@@ -98,7 +99,7 @@ model Course {
 
   // Relations
   teacher      User          @relation("TeacherCourses", fields: [teacherId], references: [id])
-  teacherId    Int
+  teacherId    String
   lessons      Lesson[]
   enrollments  Enrollment[]
   progresses   Progress[]
@@ -108,7 +109,7 @@ model Course {
 }
 
 model Lesson {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   title     String
   content   String
   videoUrl  String
@@ -118,13 +119,13 @@ model Lesson {
 
   // Relations
   course     Course     @relation(fields: [courseId], references: [id])
-  courseId   Int
+  courseId   String
   progresses Progress[]
   questions  Question[]
 }
 
 model Enrollment {
-  id         Int        @id @default(autoincrement())
+  id         String     @id @default(cuid())
   accessType AccessType
   status     String // e.g., PENDING, ACTIVE
   createdAt  DateTime   @default(now())
@@ -132,15 +133,15 @@ model Enrollment {
 
   // Relations
   student   User   @relation(fields: [studentId], references: [id])
-  studentId Int
+  studentId String
   course    Course @relation(fields: [courseId], references: [id])
-  courseId  Int
+  courseId  String
 
   @@unique([studentId, courseId])
 }
 
 model Progress {
-  id               Int           @id @default(autoincrement())
+  id               String        @id @default(cuid())
   lessonCompletion Boolean       @default(false)
   quizResults      Json
   flaggedStatus    FlaggedStatus @default(NORMAL)
@@ -149,17 +150,17 @@ model Progress {
 
   // Relations
   student   User   @relation(fields: [studentId], references: [id])
-  studentId Int
+  studentId String
   course    Course @relation(fields: [courseId], references: [id])
-  courseId  Int
+  courseId  String
   lesson    Lesson @relation(fields: [lessonId], references: [id])
-  lessonId  Int
+  lessonId  String
 
   @@unique([studentId, lessonId])
 }
 
 model Group {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(cuid())
   groupType GroupType
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -169,19 +170,19 @@ model Group {
 }
 
 model GroupMember {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   // Relations
-  group     Group @relation(fields: [groupId], references: [id])
-  groupId   Int
-  student   User  @relation(fields: [studentId], references: [id])
-  studentId Int
+  group     Group  @relation(fields: [groupId], references: [id])
+  groupId   String
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId String
 
   @@unique([groupId, studentId])
 }
 
 model CreditPoint {
-  id              Int      @id @default(autoincrement())
+  id              String   @id @default(cuid())
   pointsTotal     Int      @default(0)
   pointsBreakdown Json
   badgesEarned    Json
@@ -189,12 +190,12 @@ model CreditPoint {
   updatedAt       DateTime @updatedAt
 
   // Relations
-  student   User @relation(fields: [studentId], references: [id])
-  studentId Int  @unique
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId String @unique
 }
 
 model Rating {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   rating    Int
   review    String?
   createdAt DateTime @default(now())
@@ -202,15 +203,15 @@ model Rating {
 
   // Relations
   student   User   @relation(fields: [studentId], references: [id])
-  studentId Int
+  studentId String
   course    Course @relation(fields: [courseId], references: [id])
-  courseId  Int
+  courseId  String
 
   @@unique([studentId, courseId])
 }
 
 model Question {
-  id            Int      @id @default(autoincrement())
+  id            String   @id @default(cuid())
   content       String
   priorityScore Float    @default(0)
   upvoteCount   Int      @default(0)
@@ -219,38 +220,38 @@ model Question {
 
   // Relations
   student   User             @relation(fields: [studentId], references: [id])
-  studentId Int
+  studentId String
   lesson    Lesson           @relation(fields: [lessonId], references: [id])
-  lessonId  Int
+  lessonId  String
   upvotes   QuestionUpvote[]
 }
 
 model QuestionUpvote {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   // Relations
   question   Question @relation(fields: [questionId], references: [id])
-  questionId Int
+  questionId String
   user       User     @relation(fields: [userId], references: [id])
-  userId     Int
+  userId     String
 
   @@unique([questionId, userId])
 }
 
 model Certificate {
-  id          Int             @id @default(autoincrement())
+  id          String          @id @default(cuid())
   achievement AchievementType
   dateIssued  DateTime        @default(now())
 
   // Relations
   student   User   @relation(fields: [studentId], references: [id])
-  studentId Int
+  studentId String
   course    Course @relation(fields: [courseId], references: [id])
-  courseId  Int
+  courseId  String
 }
 
 model Revenue {
-  id                Int      @id @default(autoincrement())
+  id                String   @id @default(cuid())
   earnedAmount      Float    @default(0)
   studentEnrollment Int
   createdAt         DateTime @default(now())
@@ -258,7 +259,7 @@ model Revenue {
 
   // Relations
   teacher   User   @relation(fields: [teacherId], references: [id])
-  teacherId Int
+  teacherId String
   course    Course @relation(fields: [courseId], references: [id])
-  courseId  Int
+  courseId  String
 }

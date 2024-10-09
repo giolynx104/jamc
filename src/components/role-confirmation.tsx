@@ -30,11 +30,11 @@ export function RoleConfirmationComponent() {
           <RadioGroup onValueChange={setRole} className="flex flex-col space-y-2">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="teacher" id="teacher" />
-              <Label htmlFor="teacher">I'm a Teacher</Label>
+              <Label htmlFor="teacher">I&apos;m a Teacher</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="student" id="student" />
-              <Label htmlFor="student">I'm a Student</Label>
+              <Label htmlFor="student">I&apos;m a Student</Label>
             </div>
           </RadioGroup>
         </CardContent>
