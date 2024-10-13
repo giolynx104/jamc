@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,35 +20,27 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { PasswordField } from "@/components/password-field";
 import { OAuthSection } from "@/components/oauth-section";
+import { teacherRegistrationSchema, TeacherRegistrationInput } from "@/lib/validation-schemas";
 
 export function TeacherRegistrationComponent() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    schoolName: "",
-  });
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TeacherRegistrationInput>({
+    resolver: zodResolver(teacherRegistrationSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: TeacherRegistrationInput) => {
     setError("");
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
 
     try {
       // Here you would typically make an API call to register the teacher
       // For demonstration, we'll just simulate a successful registration
-      console.log("Teacher registration data:", formData);
+      console.log("Teacher registration data:", data);
       router.push("/teacher-dashboard");
     } catch (err) {
       console.error(err);
@@ -75,51 +69,42 @@ export function TeacherRegistrationComponent() {
             </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
-                name="name"
-                type="text"
-                required
-                onChange={handleChange}
+                {...register("name")}
+                className={errors.name ? "border-red-500" : ""}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              )}
             </div>
             <div>
               <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
-                required
-                onChange={handleChange}
+                {...register("email")}
+                className={errors.email ? "border-red-500" : ""}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
             <PasswordField
               id="password"
-              name="password"
               label="Password"
-              required
-              onChange={handleChange}
+              {...register("password")}
+              error={errors.password}
             />
             <PasswordField
               id="confirmPassword"
-              name="confirmPassword"
               label="Confirm Password"
-              required
-              onChange={handleChange}
+              {...register("confirmPassword")}
+              error={errors.confirmPassword}
             />
-            <div>
-              <Label htmlFor="schoolName">School Name</Label>
-              <Input
-                id="schoolName"
-                name="schoolName"
-                type="text"
-                required
-                onChange={handleChange}
-              />
-            </div>
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
