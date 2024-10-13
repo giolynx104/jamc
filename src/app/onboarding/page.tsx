@@ -1,7 +1,7 @@
-import { WelcomePageComponent } from "@/components/welcome-page"
+import { OnboardingComponent } from "@/components/onboarding"
 
 export default function OnboardingPage() {
   return (
-    <WelcomePageComponent />
+    <OnboardingComponent />
   )
 }

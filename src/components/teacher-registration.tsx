@@ -41,7 +41,7 @@ export function TeacherRegistrationComponent() {
       // Here you would typically make an API call to register the teacher
       // For demonstration, we'll just simulate a successful registration
       console.log("Teacher registration data:", data);
-      router.push("/teacher-dashboard");
+      router.push("/dashboard");
     } catch (err) {
       console.error(err);
       setError("Failed to register. Please try again.");
@@ -61,7 +61,6 @@ export function TeacherRegistrationComponent() {
         </CardHeader>
         <CardContent>
           <OAuthSection />
-
           <div className="relative my-6">
             <Separator />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
