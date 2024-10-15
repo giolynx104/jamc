@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+import { WelcomePageComponent } from './welcome-page'
+import { RoleConfirmationComponent } from './role-confirmation'
+import { TeacherVerificationComponent } from './teacher-verification'
+import { AvatarUploadComponent } from './avatar-upload'
+import { ClassCodeComponent } from './class-code'
+import { Button } from "@/components/ui/button"
+import { Card, CardFooter } from "@/components/ui/card"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 type OnboardingStep = 'welcome' | 'role' | 'teacherVerification' | 'avatar' | 'classCode'
@@ -21,27 +22,6 @@ export function OnboardingComponent() {
     classCode: '',
   })
   const router = useRouter()
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'teacherDocument' | 'avatar') => {
-    if (e.target.files && e.target.files[0]) {
-      if (field === 'avatar') {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          if (e.target?.result) {
-            setFormData(prev => ({ ...prev, [field]: e.target!.result as string }))
-          }
-        }
-        reader.readAsDataURL(e.target.files[0])
-      } else {
-        setFormData(prev => ({ ...prev, [field]: e.target.files![0] }))
-      }
-    }
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,105 +62,15 @@ export function OnboardingComponent() {
   const renderStep = () => {
     switch (step) {
       case 'welcome':
-        return (
-          <>
-            <CardHeader>
-              <CardTitle>Welcome to JAMC!</CardTitle>
-              <CardDescription>We&apos;re excited to have you on board.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-center mb-4">
-                Let&apos;s get your account set up so you can start learning or teaching right away.
-              </p>
-              <p className="text-center text-sm text-muted-foreground">
-                We&apos;ll guide you through a few quick steps to complete your profile.
-              </p>
-            </CardContent>
-          </>
-        )
+        return <WelcomePageComponent />
       case 'role':
-        return (
-          <>
-            <CardHeader>
-              <CardTitle>Confirm Your Role</CardTitle>
-              <CardDescription>Are you a teacher or a student?</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))} className="flex flex-col space-y-2">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="teacher" id="teacher" />
-                  <Label htmlFor="teacher">I&apos;m a Teacher</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="student" id="student" />
-                  <Label htmlFor="student">I&apos;m a Student</Label>
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </>
-        )
+        return <RoleConfirmationComponent setFormData={setFormData} />
       case 'teacherVerification':
-        return (
-          <>
-            <CardHeader>
-              <CardTitle>Teacher Verification</CardTitle>
-              <CardDescription>Please upload a document to verify your teaching credentials.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="document">Upload Document</Label>
-                  <Input id="document" type="file" onChange={(e) => handleFileChange(e, 'teacherDocument')} />
-                </div>
-              </div>
-            </CardContent>
-          </>
-        )
+        return <TeacherVerificationComponent setFormData={setFormData} />
       case 'avatar':
-        return (
-          <>
-            <CardHeader>
-              <CardTitle>Upload Your Avatar</CardTitle>
-              <CardDescription>Choose a profile picture for your account.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  {formData.avatar && (
-                    <div className="mb-4">
-                      <Image src={formData.avatar} alt="Avatar preview" width={100} height={100} className="rounded-full mx-auto" />
-                    </div>
-                  )}
-                  <Label htmlFor="avatar">Choose Image</Label>
-                  <Input id="avatar" type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'avatar')} />
-                </div>
-              </div>
-            </CardContent>
-          </>
-        )
+        return <AvatarUploadComponent setFormData={setFormData} />
       case 'classCode':
-        return (
-          <>
-            <CardHeader>
-              <CardTitle>Enter Class Code</CardTitle>
-              <CardDescription>If you have a class code, enter it below to join your class.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="classCode">Class Code</Label>
-                  <Input 
-                    id="classCode"
-                    name="classCode"
-                    placeholder="Enter your class code" 
-                    value={formData.classCode}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </>
-        )
+        return <ClassCodeComponent setFormData={setFormData} />
     }
   }
 
