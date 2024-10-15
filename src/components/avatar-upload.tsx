@@ -5,17 +5,16 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from "@/component
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from 'next/image'
+import { UseFormRegister, FieldErrors, UseFormSetValue } from "react-hook-form"
+import { OnboardingInput } from "@/lib/validation-schemas"
 
 interface AvatarUploadProps {
-  setFormData: React.Dispatch<React.SetStateAction<{
-    role: string;
-    teacherDocument: File | null;
-    avatar: string;
-    classCode: string;
-  }>>
+  register: UseFormRegister<OnboardingInput>
+  errors: FieldErrors<OnboardingInput>
+  setValue: UseFormSetValue<OnboardingInput>
 }
 
-export function AvatarUploadComponent({ setFormData }: AvatarUploadProps) {
+export function AvatarUploadComponent({ register, errors, setValue }: AvatarUploadProps) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,7 +23,7 @@ export function AvatarUploadComponent({ setFormData }: AvatarUploadProps) {
       reader.onload = (e) => {
         if (e.target?.result) {
           setAvatarPreview(e.target.result as string)
-          setFormData(prev => ({ ...prev, avatar: e.target!.result as string }))
+          setValue('avatar', e.target.result as string)
         }
       }
       reader.readAsDataURL(e.target.files[0])
@@ -47,6 +46,7 @@ export function AvatarUploadComponent({ setFormData }: AvatarUploadProps) {
             )}
             <Label htmlFor="avatar">Choose Image</Label>
             <Input id="avatar" type="file" accept="image/*" onChange={handleFileChange} />
+            {errors.avatar && <p className="text-red-500 text-sm">{errors.avatar.message}</p>}
           </div>
         </div>
       </CardContent>

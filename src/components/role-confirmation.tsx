@@ -1,19 +1,17 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import { UseFormRegister, FieldErrors } from "react-hook-form"
+import { OnboardingInput } from "@/lib/validation-schemas"
 
 interface RoleConfirmationProps {
-  setFormData: React.Dispatch<React.SetStateAction<{
-    role: string;
-    teacherDocument: File | null;
-    avatar: string;
-    classCode: string;
-  }>>
+  register: UseFormRegister<OnboardingInput>
+  errors: FieldErrors<OnboardingInput>
 }
 
-export function RoleConfirmationComponent({ setFormData }: RoleConfirmationProps) {
+export function RoleConfirmationComponent({ register, errors }: RoleConfirmationProps) {
   return (
     <>
       <CardHeader>
@@ -21,16 +19,17 @@ export function RoleConfirmationComponent({ setFormData }: RoleConfirmationProps
         <CardDescription>Are you a teacher or a student?</CardDescription>
       </CardHeader>
       <CardContent>
-        <RadioGroup onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))} className="flex flex-col space-y-2">
+        <RadioGroup className="flex flex-col space-y-2">
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="teacher" id="teacher" />
-            <Label htmlFor="teacher">I'm a Teacher</Label>
+            <RadioGroupItem value="teacher" id="teacher" {...register("role")} />
+            <Label htmlFor="teacher">I&apos;m a Teacher</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="student" id="student" />
-            <Label htmlFor="student">I'm a Student</Label>
+            <RadioGroupItem value="student" id="student" {...register("role")} />
+            <Label htmlFor="student">I&apos;m a Student</Label>
           </div>
         </RadioGroup>
+        {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>}
       </CardContent>
     </>
   )

@@ -1,6 +1,15 @@
 import { z } from "zod";
 
-// ... (keep any existing schemas)
+export const onboardingSchema = z.object({
+  role: z.enum(["student", "teacher"], {
+    required_error: "Please select a role",
+  }),
+  teacherDocument: z.instanceof(File).optional().nullable(),
+  avatar: z.string().min(1, "Please upload an avatar"),
+  classCode: z.string().optional(),
+});
+
+export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
 export const teacherRegistrationSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters long"),

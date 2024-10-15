@@ -39,16 +39,19 @@ enum AchievementType {
 
 model User {
   id            String    @id @default(cuid())
-  name          String
+  name          String?
   email         String    @unique
-  password      String
-  role          Role
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
   emailVerified DateTime?
   image         String?
+  role          Role
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
+  accounts        Account[]
+  sessions        Session[]
+  authenticators  Authenticator[]
   teacherCourses  Course[]         @relation("TeacherCourses")
   enrollments     Enrollment[]
   progresses      Progress[]
@@ -59,7 +62,6 @@ model User {
   certificates    Certificate[]
   revenues        Revenue[]
   questionUpvotes QuestionUpvote[]
-  accounts        Account[]
 }
 
 model Account {
@@ -78,7 +80,21 @@ model Account {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model VerificationToken {
@@ -87,6 +103,22 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Authenticator {
+  id                   String  @id @default(cuid())
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, credentialID])
 }
 
 model Course {

@@ -1,24 +1,17 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { UseFormRegister, FieldErrors } from "react-hook-form"
+import { OnboardingInput } from "@/lib/validation-schemas"
 
 interface ClassCodeProps {
-  setFormData: React.Dispatch<React.SetStateAction<{
-    role: string;
-    teacherDocument: File | null;
-    avatar: string;
-    classCode: string;
-  }>>
+  register: UseFormRegister<OnboardingInput>
+  errors: FieldErrors<OnboardingInput>
 }
 
-export function ClassCodeComponent({ setFormData }: ClassCodeProps) {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
+export function ClassCodeComponent({ register, errors }: ClassCodeProps) {
   return (
     <>
       <CardHeader>
@@ -31,10 +24,10 @@ export function ClassCodeComponent({ setFormData }: ClassCodeProps) {
             <Label htmlFor="classCode">Class Code</Label>
             <Input 
               id="classCode"
-              name="classCode"
+              {...register("classCode")}
               placeholder="Enter your class code" 
-              onChange={handleInputChange}
             />
+            {errors.classCode && <p className="text-red-500 text-sm">{errors.classCode.message}</p>}
           </div>
         </div>
       </CardContent>

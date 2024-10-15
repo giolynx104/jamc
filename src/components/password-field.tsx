@@ -3,15 +3,13 @@
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from 'lucide-react';
 import { FieldError } from "react-hook-form";
 
-interface PasswordFieldProps {
+interface PasswordFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label: string;
   error?: FieldError;
-  [x: string]: any;
 }
 
 export function PasswordField({ id, label, error, ...props }: PasswordFieldProps) {
