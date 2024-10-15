@@ -38,8 +38,6 @@ export function TeacherRegistrationComponent() {
     setError("");
 
     try {
-      // Here you would typically make an API call to register the teacher
-      // For demonstration, we'll just simulate a successful registration
       console.log("Teacher registration data:", data);
       router.push("/dashboard");
     } catch (err) {

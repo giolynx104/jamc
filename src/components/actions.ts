@@ -3,5 +3,5 @@
 import { signIn } from "@/auth";
 
 export async function handleSignIn(provider: string) {
-  await signIn(provider, { callbackUrl: "/onboarding" });
+  await signIn(provider, { redirectTo: "/onboarding" });
 }
