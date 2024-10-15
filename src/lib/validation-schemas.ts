@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const onboardingSchema = z.object({
-  role: z.enum(["student", "teacher"], {
+  role: z.enum(["STUDENT", "TEACHER"], {
     required_error: "Please select a role",
   }),
   teacherDocument: z.instanceof(File).optional().nullable(),

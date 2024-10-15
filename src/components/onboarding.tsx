@@ -24,6 +24,7 @@ type OnboardingStep =
 
 export function OnboardingComponent() {
   const [step, setStep] = useState<OnboardingStep>("welcome");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const {
@@ -37,27 +38,38 @@ export function OnboardingComponent() {
     mode: "onChange",
   });
 
+  // Watch the role field
   const role = watch("role");
 
   const onSubmit: SubmitHandler<OnboardingInput> = async (data) => {
+    setIsSubmitting(true);
     console.log("Submitting form data:", data);
-    const result = await persistOnboardingData(data);
-    if (result.success) {
-      router.push(`/dashboard/${data.role}`);
-    } else {
-      console.error("Failed to persist onboarding data:", result.message);
+    try {
+      const result = await persistOnboardingData(data);
+      if (result.success) {
+        router.push(`/dashboard/${data.role.toLowerCase()}`);
+      } else {
+        console.error("Failed to persist onboarding data:", result.message);
+        // TODO: Show error message to user
+      }
+    } catch (error) {
+      console.error("Error during onboarding submission:", error);
+      // TODO: Show error message to user
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const getSteps = (role: string): OnboardingStep[] => {
+  const getSteps = (): OnboardingStep[] => {
     const commonSteps: OnboardingStep[] = ["welcome", "role", "avatar"];
-    return role === "teacher"
+    if (!role) return commonSteps;
+    return role === "TEACHER"
       ? [...commonSteps, "teacherVerification"]
       : [...commonSteps, "classCode"];
   };
 
   const nextStep = () => {
-    const steps = getSteps(role);
+    const steps = getSteps();
     const currentIndex = steps.indexOf(step);
     if (currentIndex < steps.length - 1) {
       setStep(steps[currentIndex + 1]);
@@ -67,7 +79,7 @@ export function OnboardingComponent() {
   };
 
   const prevStep = () => {
-    const steps = getSteps(role);
+    const steps = getSteps();
     const currentIndex = steps.indexOf(step);
     if (currentIndex > 0) {
       setStep(steps[currentIndex - 1]);
@@ -85,7 +97,12 @@ export function OnboardingComponent() {
         return <WelcomePageComponent />;
       case "role":
         return (
-          <RoleConfirmationComponent register={register} errors={errors} />
+          <RoleConfirmationComponent 
+            register={register}
+            errors={errors}
+            value={role as "TEACHER" | "STUDENT" | undefined}
+            onChange={(newRole: "TEACHER" | "STUDENT") => setValue("role", newRole)}
+          />
         );
       case "teacherVerification":
         return (
@@ -123,9 +140,8 @@ export function OnboardingComponent() {
     }
   };
 
-  const totalSteps = 4;
-  const steps = getSteps(role);
-  const currentStepIndex = steps.indexOf(step);
+  const totalSteps = getSteps().length;
+  const currentStepIndex = getSteps().indexOf(step);
 
   return (
     <div className="container mx-auto flex flex-col items-center justify-center min-h-screen space-y-8">
@@ -137,7 +153,7 @@ export function OnboardingComponent() {
               type="button"
               variant="outline"
               onClick={prevStep}
-              disabled={currentStepIndex === 0}
+              disabled={currentStepIndex === 0 || isSubmitting}
             >
               <ChevronLeft className="mr-2 h-4 w-4" /> Back
             </Button>
@@ -147,19 +163,27 @@ export function OnboardingComponent() {
                 variant="ghost"
                 onClick={handleSkipClassCode}
                 className="text-gray-500 hover:text-black transition-colors"
+                disabled={isSubmitting}
               >
                 Skip for now
               </Button>
             )}
             <Button
-              type={currentStepIndex === steps.length - 1 ? "submit" : "button"}
+              type={currentStepIndex === getSteps().length - 1 ? "submit" : "button"}
               onClick={
-                currentStepIndex === steps.length - 1 ? undefined : nextStep
+                currentStepIndex === getSteps().length - 1 ? undefined : nextStep
               }
-              disabled={isNextDisabled()}
+              disabled={isNextDisabled() || isSubmitting}
             >
-              {currentStepIndex === steps.length - 1 ? "Finish" : "Next"}{" "}
-              <ChevronRight className="ml-2 h-4 w-4" />
+              {isSubmitting ? (
+                "Submitting..."
+              ) : currentStepIndex === getSteps().length - 1 ? (
+                "Finish"
+              ) : (
+                <>
+                  Next <ChevronRight className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
           </CardFooter>
         </form>

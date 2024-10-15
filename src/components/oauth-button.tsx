@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FaGoogle, FaFacebook, FaGithub } from "react-icons/fa";
-import { handleSignIn } from "./actions";
+import { handleSignIn } from "@/actions";
 import { Loader2 } from "lucide-react";
 
 type OAuthProvider = "Google" | "Facebook" | "GitHub";

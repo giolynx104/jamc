@@ -9,9 +9,11 @@ import { OnboardingInput } from "@/lib/validation-schemas"
 interface RoleConfirmationProps {
   register: UseFormRegister<OnboardingInput>
   errors: FieldErrors<OnboardingInput>
+  value: "TEACHER" | "STUDENT" | undefined
+  onChange: (role: "TEACHER" | "STUDENT") => void
 }
 
-export function RoleConfirmationComponent({ register, errors }: RoleConfirmationProps) {
+export function RoleConfirmationComponent({ register, errors, value, onChange }: RoleConfirmationProps) {
   return (
     <>
       <CardHeader>
@@ -19,13 +21,17 @@ export function RoleConfirmationComponent({ register, errors }: RoleConfirmation
         <CardDescription>Are you a teacher or a student?</CardDescription>
       </CardHeader>
       <CardContent>
-        <RadioGroup className="flex flex-col space-y-2">
+        <RadioGroup 
+          className="flex flex-col space-y-2" 
+          value={value} 
+          onValueChange={onChange}
+        >
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="teacher" id="teacher" {...register("role")} />
+            <RadioGroupItem value="TEACHER" id="teacher" {...register("role")} />
             <Label htmlFor="teacher">I&apos;m a Teacher</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="student" id="student" {...register("role")} />
+            <RadioGroupItem value="STUDENT" id="student" {...register("role")} />
             <Label htmlFor="student">I&apos;m a Student</Label>
           </div>
         </RadioGroup>
