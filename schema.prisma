@@ -11,6 +11,7 @@ generator client {
 }
 
 enum Role {
+  ONBOARDING
   STUDENT
   TEACHER
 }
@@ -43,7 +44,7 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  role          Role
+  role          Role      @default(ONBOARDING)
   password      String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
