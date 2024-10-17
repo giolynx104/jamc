@@ -1,11 +1,15 @@
 import { z } from "zod";
 
+const avatarSchema = z.object({
+  file: z.instanceof(File),
+  signedUrl: z.string().url(),
+  publicUrl: z.string().url(),
+});
+
 export const onboardingSchema = z.object({
-  role: z.enum(["STUDENT", "TEACHER"], {
-    required_error: "Please select a role",
-  }),
-  teacherDocument: z.instanceof(File).optional().nullable(),
-  avatar: z.string().min(1, "Please upload an avatar"),
+  role: z.enum(["TEACHER", "STUDENT"]),
+  teacherDocument: z.instanceof(File).optional(),
+  avatar: avatarSchema.optional(),
   classCode: z.string().optional(),
 });
 

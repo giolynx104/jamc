@@ -10,55 +10,44 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import { UseFormRegister, FieldErrors, UseFormSetValue } from "react-hook-form";
+import { FieldErrors, UseFormSetValue } from "react-hook-form";
 import { OnboardingInput } from "@/lib/validation-schemas";
 import { getSignedUrlConfigured } from "@/actions";
 
 interface AvatarUploadProps {
-  register: UseFormRegister<OnboardingInput>;
   errors: FieldErrors<OnboardingInput>;
   setValue: UseFormSetValue<OnboardingInput>;
 }
 
-export function AvatarUploadComponent({
-  register,
-  errors,
-  setValue,
-}: AvatarUploadProps) {
+export function AvatarUploadComponent({ errors, setValue }: AvatarUploadProps) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [isGeneratingUrl, setIsGeneratingUrl] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setUploading(true);
+      const localUrl = URL.createObjectURL(file);
+      setAvatarPreview(localUrl);
 
+      setIsGeneratingUrl(true);
       try {
-        // Get signed URL
         const { success, error } = await getSignedUrlConfigured(file.type);
         if (error) throw new Error(error);
         if (!success?.url) throw new Error("No URL returned");
 
-        // Upload to S3
-        const response = await fetch(success.url, {
-          method: "PUT",
-          body: file,
-          headers: { "Content-Type": file.type },
-        });
-
-        if (!response.ok) throw new Error("Upload failed");
-
-        // Get the public URL
+        // Get the public URL (without query parameters)
         const publicUrl = success.url.split("?")[0];
 
-        // Set preview and form value
-        setAvatarPreview(publicUrl);
-        setValue("avatar", publicUrl);
+        setValue("avatar", {
+          file,
+          signedUrl: success.url,
+          publicUrl,
+        });
       } catch (error) {
-        console.error("Error uploading file:", error);
+        console.error("Error generating signed URL:", error);
         // TODO: Show error message to user
       } finally {
-        setUploading(false);
+        setIsGeneratingUrl(false);
       }
     }
   };
@@ -91,9 +80,9 @@ export function AvatarUploadComponent({
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              disabled={uploading}
+              disabled={isGeneratingUrl}
             />
-            {uploading && <p>Uploading...</p>}
+            {isGeneratingUrl && <p>Generating URL...</p>}
             {errors.avatar && (
               <p className="text-red-500 text-sm">{errors.avatar.message}</p>
             )}

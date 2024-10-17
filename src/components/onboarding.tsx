@@ -42,9 +42,27 @@ export function OnboardingComponent() {
 
   const onSubmit: SubmitHandler<OnboardingInput> = async (data) => {
     setIsSubmitting(true);
-    console.log("Submitting form data:", data);
     try {
-      const result = await persistOnboardingData(data);
+      let avatarUrl = data.avatar?.publicUrl;
+
+      if (data.avatar?.file && data.avatar.signedUrl) {
+        // Upload to S3
+        const response = await fetch(data.avatar.signedUrl, {
+          method: "PUT",
+          body: data.avatar.file,
+          headers: { "Content-Type": data.avatar.file.type },
+        });
+
+        if (!response.ok) throw new Error("Upload failed");
+
+        avatarUrl = data.avatar.publicUrl;
+      }
+
+      const result = await persistOnboardingData({
+        ...data,
+        avatar: avatarUrl,
+      });
+
       if (result.success) {
         router.push(`/dashboard/${data.role.toLowerCase()}`);
       } else {
@@ -112,13 +130,7 @@ export function OnboardingComponent() {
           />
         );
       case "avatar":
-        return (
-          <AvatarUploadComponent
-            register={register}
-            errors={errors}
-            setValue={setValue}
-          />
-        );
+        return <AvatarUploadComponent errors={errors} setValue={setValue} />;
       case "classCode":
         return <ClassCodeComponent register={register} errors={errors} />;
     }

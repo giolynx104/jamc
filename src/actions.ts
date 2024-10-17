@@ -90,7 +90,9 @@ export async function handleSignIn(provider: string) {
   await signIn(provider, { redirectTo: "/onboarding" });
 }
 
-export async function persistOnboardingData(data: OnboardingInput) {
+export async function persistOnboardingData(
+  data: Omit<OnboardingInput, "avatar"> & { avatar?: string }
+) {
   const session = await auth();
   if (!session || !session.user) {
     throw new Error("User not authenticated");
@@ -103,7 +105,7 @@ export async function persistOnboardingData(data: OnboardingInput) {
       where: { email: session.user.email! },
       data: {
         role: role,
-        image: avatar,
+        image: avatar, // Now avatar is a string URL
       },
     });
 
