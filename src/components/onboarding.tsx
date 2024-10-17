@@ -38,7 +38,6 @@ export function OnboardingComponent() {
     mode: "onChange",
   });
 
-  // Watch the role field
   const role = watch("role");
 
   const onSubmit: SubmitHandler<OnboardingInput> = async (data) => {
@@ -73,8 +72,6 @@ export function OnboardingComponent() {
     const currentIndex = steps.indexOf(step);
     if (currentIndex < steps.length - 1) {
       setStep(steps[currentIndex + 1]);
-    } else {
-      handleSubmit(onSubmit)();
     }
   };
 
@@ -170,9 +167,7 @@ export function OnboardingComponent() {
             )}
             <Button
               type={currentStepIndex === getSteps().length - 1 ? "submit" : "button"}
-              onClick={
-                currentStepIndex === getSteps().length - 1 ? undefined : nextStep
-              }
+              onClick={nextStep}
               disabled={isNextDisabled() || isSubmitting}
             >
               {isSubmitting ? (
