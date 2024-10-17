@@ -20,9 +20,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { PasswordField } from "@/components/password-field";
 import { OAuthSection } from "@/components/oauth-section";
-import { teacherRegistrationSchema, TeacherRegistrationInput } from "@/lib/validation-schemas";
+import { signUpSchema, SignUpInput } from "@/lib/validation-schemas";
+import { signUp } from "@/actions";
 
-export function TeacherRegistrationComponent() {
+export function SignUpComponent() {
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -30,16 +31,23 @@ export function TeacherRegistrationComponent() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TeacherRegistrationInput>({
-    resolver: zodResolver(teacherRegistrationSchema),
+  } = useForm<SignUpInput>({
+    resolver: zodResolver(signUpSchema),
   });
 
-  const onSubmit = async (data: TeacherRegistrationInput) => {
+  const onSubmit = async (data: SignUpInput) => {
     setError("");
 
     try {
-      console.log("Teacher registration data:", data);
-      router.push("/dashboard");
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+
+      const result = await signUp(formData);
+      if (result.error) {
+        setError(result.error);
+      } else if (result.success) {
+        router.push("/dashboard");
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to register. Please try again.");
@@ -51,10 +59,10 @@ export function TeacherRegistrationComponent() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Teacher Registration
+            Sign Up
           </CardTitle>
           <CardDescription className="text-center">
-            Join JAMC and start creating your classes
+            Join JAMC and shape the future of education
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -95,12 +103,6 @@ export function TeacherRegistrationComponent() {
               label="Password"
               {...register("password")}
               error={errors.password}
-            />
-            <PasswordField
-              id="confirmPassword"
-              label="Confirm Password"
-              {...register("confirmPassword")}
-              error={errors.confirmPassword}
             />
             {error && (
               <Alert variant="destructive">

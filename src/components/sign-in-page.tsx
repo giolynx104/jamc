@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,31 +20,35 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { PasswordField } from "@/components/password-field";
 import { OAuthSection } from "@/components/oauth-section";
+import { signInSchema, SignInInput } from "@/lib/validation-schemas";
+import { signInUser } from "@/actions";
 
 export function LoginPageComponent() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: SignInInput) => {
     setError("");
 
     try {
-      // Here you would typically make an API call to authenticate the user
-      // For demonstration, we'll just simulate a successful login
-      console.log("Login data:", formData);
-      router.push("/dashboard");
+      const result = await signInUser(data);
+
+      if (!result.success) {
+        setError(result.message);
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       console.error(err);
-      setError("Failed to log in. Please check your credentials and try again.");
+      setError("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -59,7 +65,6 @@ export function LoginPageComponent() {
         </CardHeader>
         <CardContent>
           <OAuthSection action="Sign in" />
-
           <div className="relative my-6">
             <Separator />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
@@ -67,23 +72,26 @@ export function LoginPageComponent() {
             </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
-                required
-                onChange={handleChange}
+                {...register("email")}
+                className={errors.email ? "border-red-500" : ""}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
             <PasswordField
               id="password"
-              name="password"
               label="Password"
-              required
-              onChange={handleChange}
+              {...register("password")}
+              error={errors.password}
             />
             {error && (
               <Alert variant="destructive">
@@ -103,7 +111,7 @@ export function LoginPageComponent() {
             <Button
               variant="link"
               className="p-0"
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/signup")}
             >
               Sign up
             </Button>

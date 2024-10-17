@@ -9,7 +9,7 @@ import { FieldError } from "react-hook-form";
 interface PasswordFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label: string;
-  error?: FieldError;
+  error?: FieldError | undefined;
 }
 
 export function PasswordField({ id, label, error, ...props }: PasswordFieldProps) {
