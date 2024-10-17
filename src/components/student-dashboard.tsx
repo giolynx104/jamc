@@ -1,145 +1,168 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, BookOpen, Calendar, ChevronRight } from 'lucide-react'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bell, Home, Calendar, Settings, GraduationCap } from "lucide-react";
+import { CourseProgressList } from "@/components/course-progress-list";
+import { DiscussionList } from "@/components/discussion-list";
+import { RecommendedCourses } from "@/components/recommended-courses";
+import { ProfileCard } from "@/components/profile-card";
+import { AccountSettingsCard } from "@/components/account-settings-card";
+import { getUserProfile } from "@/actions";
+import { UserProfile } from "@/lib/validation-schemas";
 
-// Mock data
+// Mock data (keep these for now, we'll replace them gradually)
 const enrolledCourses = [
-  { id: 1, name: "Mathematics 101", progress: 65 },
-  { id: 2, name: "History: World War II", progress: 30 },
-  { id: 3, name: "Introduction to Biology", progress: 80 },
-]
-
-const upcomingAssignments = [
-  { id: 1, title: "Math Quiz", course: "Mathematics 101", dueDate: "2024-10-20" },
-  { id: 2, title: "History Essay", course: "History: World War II", dueDate: "2024-10-25" },
-]
+  { id: 1, name: "Mathematics 101", progress: 65, notifications: 2 },
+  { id: 2, name: "History: World War II", progress: 30, notifications: 0 },
+  { id: 3, name: "Introduction to Biology", progress: 80, notifications: 1 },
+];
 
 const recommendedCourses = [
-  { id: 1, name: "Advanced Algebra", description: "Take your math skills to the next level" },
-  { id: 2, name: "Ancient Civilizations", description: "Explore the wonders of ancient history" },
-]
+  {
+    id: 1,
+    name: "Advanced Algebra",
+    description: "Take your math skills to the next level",
+  },
+  {
+    id: 2,
+    name: "Ancient Civilizations",
+    description: "Explore the wonders of ancient history",
+  },
+];
+
+const discussionQuestions = [
+  {
+    id: 1,
+    title: "How to solve quadratic equations?",
+    course: "Mathematics 101",
+    votes: 15,
+    answers: 3,
+  },
+  {
+    id: 2,
+    title: "Causes of World War II",
+    course: "History: World War II",
+    votes: 8,
+    answers: 2,
+  },
+  {
+    id: 3,
+    title: "Cell structure and function",
+    course: "Introduction to Biology",
+    votes: 12,
+    answers: 5,
+  },
+];
 
 export function StudentDashboardComponent() {
-  const [classCode, setClassCode] = useState('')
+  const [activeTab, setActiveTab] = useState("overview");
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  const handleJoinClass = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Joining class with code:', classCode)
-    // Here you would typically make an API call to join the class
-    setClassCode('')
-  }
+  useEffect(() => {
+    async function fetchUserProfile() {
+      const profile = await getUserProfile();
+      setUserProfile(profile);
+    }
+    fetchUserProfile();
+  }, []);
 
   return (
-    <div className="container mx-auto p-4">
-      <header className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Welcome, Student!</h1>
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" size="icon">
-            <Bell className="h-4 w-4" />
-          </Button>
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center">
+                <GraduationCap className="h-8 w-8 mr-2" />
+                <span className="font-bold text-xl">JAMC</span>
+              </Link>
+              <nav className="ml-10 flex items-center space-x-4">
+                <Link
+                  href="/dashboard"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <Home className="h-5 w-5" />
+                </Link>
+                <Link
+                  href="/schedule"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <Calendar className="h-5 w-5" />
+                </Link>
+                <Link
+                  href="/settings"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <Settings className="h-5 w-5" />
+                </Link>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="icon">
+                <Bell className="h-4 w-4" />
+              </Button>
+              <Avatar>
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn"
+                />
+                <AvatarFallback>JD</AvatarFallback>
+              </Avatar>
+            </div>
+          </div>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>My Courses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {enrolledCourses.map((course) => (
-              <div key={course.id} className="mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">{course.name}</h3>
-                  <span className="text-sm text-muted-foreground">{course.progress}%</span>
-                </div>
-                <Progress value={course.progress} className="w-full" />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      <main className="container mx-auto px-4 py-8">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+        >
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="discussions">Discussions</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+          </TabsList>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Join a New Class</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleJoinClass}>
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Enter class code"
-                  value={classCode}
-                  onChange={(e) => setClassCode(e.target.value)}
-                />
-                <Button type="submit">Join</Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Assignments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {upcomingAssignments.map((assignment) => (
-              <div key={assignment.id} className="mb-4">
-                <h3 className="font-semibold">{assignment.title}</h3>
-                <p className="text-sm text-muted-foreground">{assignment.course}</p>
-                <p className="text-sm">Due: {assignment.dueDate}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recommended Courses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recommendedCourses.map((course) => (
-              <div key={course.id} className="mb-4">
-                <h3 className="font-semibold">{course.name}</h3>
-                <p className="text-sm text-muted-foreground">{course.description}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <BookOpen className="mr-2 h-4 w-4 text-muted-foreground" />
-                <span>You completed Chapter 3 in Mathematics 101</span>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                <span>New assignment added to History: World War II</span>
-              </div>
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CourseProgressList courses={enrolledCourses} />
+              <DiscussionList discussions={discussionQuestions} maxItems={3} />
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button variant="link" className="w-full">
-              View All Activity <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+          </TabsContent>
+
+          <TabsContent value="courses" className="space-y-4">
+            <CourseProgressList courses={enrolledCourses} showFullList />
+            <RecommendedCourses courses={recommendedCourses} />
+          </TabsContent>
+
+          <TabsContent value="discussions" className="space-y-4">
+            <DiscussionList discussions={discussionQuestions} showFullList />
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-4">
+            {userProfile && (
+              <>
+                <ProfileCard
+                  name={userProfile.name}
+                  email={userProfile.email}
+                  role={userProfile.role}
+                  image={userProfile.image}
+                  creditPoints={userProfile.creditPoints?.pointsTotal || 0}
+                  certificates={userProfile.certificates}
+                />
+                <AccountSettingsCard email={userProfile.email} />
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
-  )
+  );
 }

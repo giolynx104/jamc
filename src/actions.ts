@@ -1,7 +1,7 @@
 "use server";
 
 import { signIn } from "@/auth";
-import { OnboardingInput, SignInInput } from "@/lib/validation-schemas";
+import { OnboardingInput, SignInInput, UserProfile } from "@/lib/validation-schemas";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import bcrypt from "bcryptjs";
@@ -153,5 +153,40 @@ export async function signInUser(data: SignInInput) {
       success: false,
       message: "An unexpected error occurred. Please try again.",
     };
+  }
+}
+
+export async function getUserProfile(): Promise<UserProfile | null> {
+  const session = await auth();
+  if (!session || !session.user) {
+    return null;
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email! },
+      include: {
+        creditPoints: true,
+        certificates: true,
+      },
+    });
+
+    if (!user) return null;
+
+    // Transform the user data to match the UserProfile type
+    const userProfile: UserProfile = {
+      ...user,
+      creditPoints: user.creditPoints ? { pointsTotal: user.creditPoints.pointsTotal } : null,
+      certificates: user.certificates.map(cert => ({
+        id: cert.id,
+        achievement: cert.achievement,
+        dateIssued: cert.dateIssued,
+      })),
+    };
+
+    return userProfile;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return null;
   }
 }
