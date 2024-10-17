@@ -1,14 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-
-interface Course {
-  id: number
-  name: string
-  progress: number
-  notifications: number
-}
+import { Course } from "@prisma/client"
 
 interface CourseProgressListProps {
   courses: Course[]
@@ -25,15 +18,13 @@ export function CourseProgressList({ courses, showFullList = false }: CourseProg
         {courses.map((course) => (
           <div key={course.id} className="mb-4">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="font-semibold">{course.name}</h3>
+              <h3 className="font-semibold">{course.title}</h3>
               <div className="flex items-center">
-                <span className="text-sm text-muted-foreground mr-2">{course.progress}%</span>
-                {course.notifications > 0 && (
-                  <Badge variant="destructive">{course.notifications}</Badge>
-                )}
+                <span className="text-sm text-muted-foreground mr-2">0%</span>
+                {/* You might want to add a way to track notifications */}
               </div>
             </div>
-            <Progress value={course.progress} className="w-full" />
+            <Progress value={0} className="w-full" />
             {showFullList && <Button variant="link" className="mt-2 p-0">Go to course</Button>}
           </div>
         ))}

@@ -37,9 +37,71 @@ export const signUpSchema = z.object({
 
 export type SignUpInput = z.infer<typeof signUpSchema>;
 
+// Define the user profile include type
+export const userProfileInclude = {
+  creditPoints: true,
+  certificates: true,
+  enrollments: {
+    include: {
+      course: true,
+    },
+  },
+} as const;
+
+// Create a type based on the include
+export type UserProfileInclude = typeof userProfileInclude;
+
+// Define the UserProfile type using Prisma's generated types and our include
 export type UserProfile = Prisma.UserGetPayload<{
-  include: {
-    creditPoints: true;
-    certificates: true;
-  }
-}>;
+  include: UserProfileInclude;
+}> & {
+  enrolledCourses: EnrolledCourse[];
+};
+
+// If you still need a Zod schema for UserProfile, you can define it like this:
+export const userProfileSchema = z.object({
+  id: z.string(),
+  name: z.string().nullable(),
+  email: z.string().email(),
+  emailVerified: z.date().nullable(),
+  image: z.string().nullable(),
+  role: z.enum(["ONBOARDING", "STUDENT", "TEACHER"]),
+  password: z.string().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  creditPoints: z.object({
+    pointsTotal: z.number(),
+  }).nullable(),
+  certificates: z.array(z.object({
+    id: z.string(),
+    achievement: z.enum(["CERTIFICATE", "BADGE"]),
+    dateIssued: z.date(),
+    studentId: z.string(),
+    courseId: z.string(),
+  })),
+  enrollments: z.array(z.object({
+    id: z.string(),
+    accessType: z.enum(["FREE", "PAID"]),
+    status: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    studentId: z.string(),
+    courseId: z.string(),
+    course: z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      rating: z.number(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
+      teacherId: z.string(),
+    }),
+  })),
+});
+
+export type EnrolledCourse = {
+  id: string;
+  name: string;
+  progress: number;
+  notifications: number;
+};

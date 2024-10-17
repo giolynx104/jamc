@@ -1,7 +1,7 @@
 "use server";
 
 import { signIn } from "@/auth";
-import { OnboardingInput, SignInInput, UserProfile } from "@/lib/validation-schemas";
+import { OnboardingInput, SignInInput, UserProfile, EnrolledCourse } from "@/lib/validation-schemas";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import bcrypt from "bcryptjs";
@@ -176,4 +176,13 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     console.error("Error fetching user profile:", error);
     return null;
   }
+}
+
+export function processUserEnrollments(user: UserProfile): EnrolledCourse[] {
+  return user.enrollments.map(enrollment => ({
+    id: enrollment.course.id,
+    name: enrollment.course.title,
+    progress: 0, // You might want to calculate this based on user progress
+    notifications: 0, // You might want to fetch this from somewhere
+  }));
 }

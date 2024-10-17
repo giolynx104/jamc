@@ -12,6 +12,7 @@ import { RecommendedCourses } from "@/components/recommended-courses";
 import { ProfileCard } from "@/components/profile-card";
 import { AccountSettingsCard } from "@/components/account-settings-card";
 import { UserProfile } from "@/lib/validation-schemas";
+import { Course } from "@prisma/client";
 
 // Mock data for recommended courses and discussions (we'll replace these later)
 const recommendedCourses = [
@@ -53,17 +54,11 @@ const discussionQuestions = [
 
 interface StudentDashboardComponentProps {
   user: UserProfile;
+  enrolledCourses: Course[];
 }
 
-export function StudentDashboardComponent({ user }: StudentDashboardComponentProps) {
+export function StudentDashboardComponent({ user, enrolledCourses }: StudentDashboardComponentProps) {
   const [activeTab, setActiveTab] = useState("overview");
-
-  const enrolledCourses = user.enrollments.map(enrollment => ({
-    id: enrollment.course.id,
-    name: enrollment.course.title,
-    progress: 0, // You might want to calculate this based on user progress
-    notifications: 0, // You might want to fetch this from somewhere
-  }));
 
   return (
     <div className="min-h-screen bg-gray-100">
