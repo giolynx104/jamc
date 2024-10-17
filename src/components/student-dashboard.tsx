@@ -1,16 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bell, Home, Calendar, Settings, GraduationCap } from "lucide-react";
 import { CourseProgressList } from "@/components/course-progress-list";
 import { DiscussionList } from "@/components/discussion-list";
 import { RecommendedCourses } from "@/components/recommended-courses";
 import { ProfileCard } from "@/components/profile-card";
 import { AccountSettingsCard } from "@/components/account-settings-card";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { UserProfile } from "@/lib/validation-schemas";
 import { Course } from "@prisma/client";
 
@@ -62,47 +59,7 @@ export function StudentDashboardComponent({ user, enrolledCourses }: StudentDash
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <GraduationCap className="h-8 w-8 mr-2" />
-                <span className="font-bold text-xl">JAMC</span>
-              </Link>
-              <nav className="ml-10 flex items-center space-x-4">
-                <Link
-                  href="/dashboard"
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <Home className="h-5 w-5" />
-                </Link>
-                <Link
-                  href="/schedule"
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <Calendar className="h-5 w-5" />
-                </Link>
-                <Link
-                  href="/settings"
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <Settings className="h-5 w-5" />
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="icon">
-                <Bell className="h-4 w-4" />
-              </Button>
-              <Avatar>
-                <AvatarImage src={user.image || undefined} alt={user.name || "User"} />
-                <AvatarFallback>{user.name ? user.name.charAt(0).toUpperCase() : "U"}</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader userImage={user.image} userName={user.name} />
 
       <main className="container mx-auto px-4 py-8">
         <Tabs

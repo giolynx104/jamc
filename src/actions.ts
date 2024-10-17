@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/auth";
+import { signIn, signOut as nextAuthSignOut } from "@/auth";
 import { OnboardingInput, SignInInput, UserProfile, EnrolledCourse } from "@/lib/validation-schemas";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
@@ -178,11 +178,12 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   }
 }
 
-export function processUserEnrollments(user: UserProfile): EnrolledCourse[] {
-  return user.enrollments.map(enrollment => ({
-    id: enrollment.course.id,
-    name: enrollment.course.title,
-    progress: 0, // You might want to calculate this based on user progress
-    notifications: 0, // You might want to fetch this from somewhere
-  }));
+export async function signOut() {
+  try {
+    await nextAuthSignOut({ redirect: false });
+    return { success: true, message: "Signed out successfully" };
+  } catch (error) {
+    console.error("Error signing out:", error);
+    return { success: false, message: "An error occurred while signing out" };
+  }
 }

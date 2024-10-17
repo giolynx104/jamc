@@ -1,17 +1,16 @@
 "use client"
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
-import { Bell, BookOpen, Users, Home, Book, Calendar, Settings, PlusCircle } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Users, PlusCircle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { RecentSubmissions } from '@/components/recent-submissions'
 import { DiscussionList } from '@/components/discussion-list'
+import { DashboardHeader } from "@/components/dashboard-header"
 
 // Mock data
 const teacherClasses = [
@@ -44,41 +43,7 @@ export function TeacherDashboardComponent() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <BookOpen className="h-8 w-8 mr-2" />
-                <span className="font-bold text-xl">JAMC</span>
-              </Link>
-              <nav className="ml-10 flex items-center space-x-4">
-                <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
-                  <Home className="h-5 w-5" />
-                </Link>
-                <Link href="/classes" className="text-gray-600 hover:text-gray-900">
-                  <Book className="h-5 w-5" />
-                </Link>
-                <Link href="/schedule" className="text-gray-600 hover:text-gray-900">
-                  <Calendar className="h-5 w-5" />
-                </Link>
-                <Link href="/settings" className="text-gray-600 hover:text-gray-900">
-                  <Settings className="h-5 w-5" />
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="icon">
-                <Bell className="h-4 w-4" />
-              </Button>
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader />
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
