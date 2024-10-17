@@ -1,13 +1,48 @@
 "use server";
 
 import { signIn } from "@/auth";
-import {
-  OnboardingInput,
-  SignInInput,
-} from "@/lib/validation-schemas";
+import { OnboardingInput, SignInInput } from "@/lib/validation-schemas";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+const generateFileName = (bytes = 32) => {
+  return crypto.randomBytes(bytes).toString("hex");
+};
+
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
+export const getSignedUrlConfigured = async (type: string) => {
+  try {
+    const session = await auth();
+    if (!session) {
+      return { error: "Unauthorized" };
+    }
+
+    const putObjectCommand = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME!,
+      Key: `${generateFileName()}.${type.split("/")[1]}`,
+      ContentType: type,
+    });
+
+    const signedUrl = await getSignedUrl(s3Client, putObjectCommand, {
+      expiresIn: 360,
+    });
+    return { success: { url: signedUrl } };
+  } catch (error) {
+    console.error("Error generating signed URL:", error);
+    return { error: "Failed to generate signed URL" };
+  }
+};
 
 export async function signUp(formData: FormData) {
   const name = formData.get("name") as string;

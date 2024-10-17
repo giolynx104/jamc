@@ -94,11 +94,13 @@ export function OnboardingComponent() {
         return <WelcomePageComponent />;
       case "role":
         return (
-          <RoleConfirmationComponent 
+          <RoleConfirmationComponent
             register={register}
             errors={errors}
             value={role as "TEACHER" | "STUDENT" | undefined}
-            onChange={(newRole: "TEACHER" | "STUDENT") => setValue("role", newRole)}
+            onChange={(newRole: "TEACHER" | "STUDENT") =>
+              setValue("role", newRole)
+            }
           />
         );
       case "teacherVerification":
@@ -166,7 +168,9 @@ export function OnboardingComponent() {
               </Button>
             )}
             <Button
-              type={currentStepIndex === getSteps().length - 1 ? "submit" : "button"}
+              type={
+                currentStepIndex === getSteps().length - 1 ? "submit" : "button"
+              }
               onClick={nextStep}
               disabled={isNextDisabled() || isSubmitting}
             >
