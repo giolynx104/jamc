@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,16 +11,9 @@ import { DiscussionList } from "@/components/discussion-list";
 import { RecommendedCourses } from "@/components/recommended-courses";
 import { ProfileCard } from "@/components/profile-card";
 import { AccountSettingsCard } from "@/components/account-settings-card";
-import { getUserProfile } from "@/actions";
 import { UserProfile } from "@/lib/validation-schemas";
 
-// Mock data (keep these for now, we'll replace them gradually)
-const enrolledCourses = [
-  { id: 1, name: "Mathematics 101", progress: 65, notifications: 2 },
-  { id: 2, name: "History: World War II", progress: 30, notifications: 0 },
-  { id: 3, name: "Introduction to Biology", progress: 80, notifications: 1 },
-];
-
+// Mock data for recommended courses and discussions (we'll replace these later)
 const recommendedCourses = [
   {
     id: 1,
@@ -58,17 +51,19 @@ const discussionQuestions = [
   },
 ];
 
-export function StudentDashboardComponent() {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+interface StudentDashboardComponentProps {
+  user: UserProfile;
+}
 
-  useEffect(() => {
-    async function fetchUserProfile() {
-      const profile = await getUserProfile();
-      setUserProfile(profile);
-    }
-    fetchUserProfile();
-  }, []);
+export function StudentDashboardComponent({ user }: StudentDashboardComponentProps) {
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const enrolledCourses = user.enrollments.map(enrollment => ({
+    id: enrollment.course.id,
+    name: enrollment.course.title,
+    progress: 0, // You might want to calculate this based on user progress
+    notifications: 0, // You might want to fetch this from somewhere
+  }));
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -106,11 +101,8 @@ export function StudentDashboardComponent() {
                 <Bell className="h-4 w-4" />
               </Button>
               <Avatar>
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage src={user.image || undefined} alt={user.name || "User"} />
+                <AvatarFallback>{user.name ? user.name.charAt(0).toUpperCase() : "U"}</AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -147,19 +139,15 @@ export function StudentDashboardComponent() {
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-4">
-            {userProfile && (
-              <>
-                <ProfileCard
-                  name={userProfile.name}
-                  email={userProfile.email}
-                  role={userProfile.role}
-                  image={userProfile.image}
-                  creditPoints={userProfile.creditPoints?.pointsTotal || 0}
-                  certificates={userProfile.certificates}
-                />
-                <AccountSettingsCard email={userProfile.email} />
-              </>
-            )}
+            <ProfileCard
+              name={user.name}
+              email={user.email}
+              role={user.role}
+              image={user.image}
+              creditPoints={user.creditPoints?.pointsTotal || 0}
+              certificates={user.certificates}
+            />
+            <AccountSettingsCard email={user.email} />
           </TabsContent>
         </Tabs>
       </main>
