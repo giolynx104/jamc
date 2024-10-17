@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
-import { Bell, BookOpen, Users, ThumbsUp, MessageSquare, Home, Book, Calendar, Settings, PlusCircle } from 'lucide-react'
+import { Bell, BookOpen, Users, Home, Book, Calendar, Settings, PlusCircle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { RecentSubmissions } from '@/components/recent-submissions'
 import { DiscussionList } from '@/components/discussion-list'

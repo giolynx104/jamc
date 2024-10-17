@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role, AchievementType } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 const avatarSchema = z.object({
   file: z.instanceof(File),
@@ -37,25 +37,9 @@ export const signUpSchema = z.object({
 
 export type SignUpInput = z.infer<typeof signUpSchema>;
 
-// New schema for the user profile
-export const userProfileSchema = z.object({
-  id: z.string(),
-  name: z.string().nullable(),
-  email: z.string().email(),
-  emailVerified: z.date().nullable(),
-  image: z.string().nullable(),
-  role: z.nativeEnum(Role),
-  password: z.string().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  creditPoints: z.object({
-    pointsTotal: z.number(),
-  }).nullable(),
-  certificates: z.array(z.object({
-    id: z.string(),
-    achievement: z.nativeEnum(AchievementType),
-    dateIssued: z.date(),
-  })),
-});
-
-export type UserProfile = z.infer<typeof userProfileSchema>;
+export type UserProfile = Prisma.UserGetPayload<{
+  include: {
+    creditPoints: true;
+    certificates: true;
+  }
+}>;

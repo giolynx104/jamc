@@ -171,20 +171,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
       },
     });
 
-    if (!user) return null;
-
-    // Transform the user data to match the UserProfile type
-    const userProfile: UserProfile = {
-      ...user,
-      creditPoints: user.creditPoints ? { pointsTotal: user.creditPoints.pointsTotal } : null,
-      certificates: user.certificates.map(cert => ({
-        id: cert.id,
-        achievement: cert.achievement,
-        dateIssued: cert.dateIssued,
-      })),
-    };
-
-    return userProfile;
+    return user; // This will be of type UserProfile
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return null;
