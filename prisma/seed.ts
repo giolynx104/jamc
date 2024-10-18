@@ -4,6 +4,7 @@ import {
   AccessType,
   AchievementType,
 } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -18,12 +19,14 @@ async function main() {
   await prisma.user.deleteMany();
 
   // Create users
+  const hashedPassword = await bcrypt.hash("Password123!", 10);
+
   const student = await prisma.user.create({
     data: {
       name: "John Doe",
       email: "john@example.com",
       role: Role.STUDENT,
-      password: "123456", // In real scenario, use bcrypt to hash
+      password: hashedPassword,
     },
   });
 
@@ -32,7 +35,7 @@ async function main() {
       name: "Jane Smith",
       email: "jane@example.com",
       role: Role.TEACHER,
-      password: "123456", // In real scenario, use bcrypt to hash
+      password: hashedPassword,
     },
   });
 

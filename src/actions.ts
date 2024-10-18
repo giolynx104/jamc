@@ -1,7 +1,12 @@
 "use server";
 
 import { signIn, signOut as nextAuthSignOut } from "@/auth";
-import { OnboardingInput, SignInInput, UserProfile, EnrolledCourse } from "@/lib/validation-schemas";
+import {
+  OnboardingInput,
+  SignInInput,
+  UserProfile,
+  userProfileInclude,
+} from "@/lib/validation-schemas";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import bcrypt from "bcryptjs";
@@ -105,7 +110,7 @@ export async function persistOnboardingData(
       where: { email: session.user.email! },
       data: {
         role: role,
-        image: avatar, // Now avatar is a string URL
+        image: avatar,
       },
     });
 
@@ -143,16 +148,13 @@ export async function signInUser(data: SignInInput) {
     });
 
     if (result?.error) {
-      return { success: false, message: "Invalid email or password" };
-    } else {
-      return { success: true, message: "Sign in successful" };
+      return { error: result.error };
     }
+
+    return { success: true };
   } catch (error) {
-    console.error("Error signing in user:", error);
-    return {
-      success: false,
-      message: "An unexpected error occurred. Please try again.",
-    };
+    console.error("Error during sign in:", error);
+    return { error: "An unexpected error occurred during sign in" };
   }
 }
 
@@ -165,13 +167,10 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   try {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email! },
-      include: {
-        creditPoints: true,
-        certificates: true,
-      },
+      include: userProfileInclude,
     });
 
-    return user; // This will be of type UserProfile
+    return user; 
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return null;

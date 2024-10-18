@@ -36,20 +36,11 @@ export function LoginPageComponent() {
   });
 
   const onSubmit = async (data: SignInInput) => {
-    console.log("Form submitted", data);
-    setError("");
-
-    try {
-      const result = await signInUser(data);
-
-      if (!result.success) {
-        setError(result.message);
-      } else {
-        router.push("/dashboard");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("An unexpected error occurred. Please try again.");
+    const result = await signInUser(data);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      router.push("/dashboard");
     }
   };
 

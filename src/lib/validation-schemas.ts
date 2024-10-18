@@ -17,8 +17,13 @@ export const onboardingSchema = z.object({
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
 export const signInSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string({ required_error: "Email is required" })
+    .min(1, "Email is required")
+    .email("Invalid email"),
+  password: z.string({ required_error: "Password is required" })
+    .min(1, "Password is required")
+    .min(8, "Password must be more than 8 characters")
+    .max(32, "Password must be less than 32 characters"),
 });
 
 export type SignInInput = z.infer<typeof signInSchema>;
@@ -54,9 +59,7 @@ export type UserProfileInclude = typeof userProfileInclude;
 // Define the UserProfile type using Prisma's generated types and our include
 export type UserProfile = Prisma.UserGetPayload<{
   include: UserProfileInclude;
-}> & {
-  enrolledCourses: EnrolledCourse[];
-};
+}>;
 
 // If you still need a Zod schema for UserProfile, you can define it like this:
 export const userProfileSchema = z.object({
@@ -69,34 +72,40 @@ export const userProfileSchema = z.object({
   password: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  creditPoints: z.object({
-    pointsTotal: z.number(),
-  }).nullable(),
-  certificates: z.array(z.object({
-    id: z.string(),
-    achievement: z.enum(["CERTIFICATE", "BADGE"]),
-    dateIssued: z.date(),
-    studentId: z.string(),
-    courseId: z.string(),
-  })),
-  enrollments: z.array(z.object({
-    id: z.string(),
-    accessType: z.enum(["FREE", "PAID"]),
-    status: z.string(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
-    studentId: z.string(),
-    courseId: z.string(),
-    course: z.object({
+  creditPoints: z
+    .object({
+      pointsTotal: z.number(),
+    })
+    .nullable(),
+  certificates: z.array(
+    z.object({
       id: z.string(),
-      title: z.string(),
-      description: z.string(),
-      rating: z.number(),
+      achievement: z.enum(["CERTIFICATE", "BADGE"]),
+      dateIssued: z.date(),
+      studentId: z.string(),
+      courseId: z.string(),
+    })
+  ),
+  enrollments: z.array(
+    z.object({
+      id: z.string(),
+      accessType: z.enum(["FREE", "PAID"]),
+      status: z.string(),
       createdAt: z.date(),
       updatedAt: z.date(),
-      teacherId: z.string(),
-    }),
-  })),
+      studentId: z.string(),
+      courseId: z.string(),
+      course: z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        rating: z.number(),
+        createdAt: z.date(),
+        updatedAt: z.date(),
+        teacherId: z.string(),
+      }),
+    })
+  ),
 });
 
 export type EnrolledCourse = {

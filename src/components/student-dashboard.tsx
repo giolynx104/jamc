@@ -54,7 +54,10 @@ interface StudentDashboardComponentProps {
   enrolledCourses: Course[];
 }
 
-export function StudentDashboardComponent({ user, enrolledCourses }: StudentDashboardComponentProps) {
+export function StudentDashboardComponent({
+  user,
+  enrolledCourses,
+}: StudentDashboardComponentProps) {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
