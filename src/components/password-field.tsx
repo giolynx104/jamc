@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from 'lucide-react';
@@ -12,32 +12,37 @@ interface PasswordFieldProps extends React.InputHTMLAttributes<HTMLInputElement>
   error?: FieldError | undefined;
 }
 
-export function PasswordField({ id, label, error, ...props }: PasswordFieldProps) {
-  const [showPassword, setShowPassword] = useState(false);
+export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
+  ({ id, label, error, ...props }, ref) => {
+    const [showPassword, setShowPassword] = useState(false);
 
-  return (
-    <div>
-      <Label htmlFor={id}>{label}</Label>
-      <div className="relative">
-        <Input
-          id={id}
-          type={showPassword ? "text" : "password"}
-          className={error ? "border-red-500 pr-10" : "pr-10"}
-          {...props}
-        />
-        <button
-          type="button"
-          className="absolute inset-y-0 right-0 pr-3 flex items-center"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          {showPassword ? (
-            <EyeOff className="h-4 w-4 text-gray-400" />
-          ) : (
-            <Eye className="h-4 w-4 text-gray-400" />
-          )}
-        </button>
+    return (
+      <div>
+        <Label htmlFor={id}>{label}</Label>
+        <div className="relative">
+          <Input
+            id={id}
+            type={showPassword ? "text" : "password"}
+            className={`${error ? "border-red-500" : ""} pr-10`}
+            ref={ref}
+            {...props}
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 w-10 flex items-center justify-center text-gray-400 hover:text-gray-600 focus:outline-none"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+        {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
       </div>
-      {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
-    </div>
-  );
-}
+    );
+  }
+);
+
+PasswordField.displayName = 'PasswordField';

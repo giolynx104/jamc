@@ -36,6 +36,7 @@ export function LoginPageComponent() {
   });
 
   const onSubmit = async (data: SignInInput) => {
+    console.log("Form submitted", data);
     setError("");
 
     try {
