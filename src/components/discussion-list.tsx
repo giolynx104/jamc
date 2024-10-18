@@ -24,17 +24,19 @@ export function DiscussionList({ discussions, showFullList = false, maxItems = 3
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>Recent Discussions</CardTitle>
-        <div className="space-x-2">
-          {!showFullList && (
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/discussions">View All</Link>
+      <CardHeader className="space-y-0 pb-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="mb-4 sm:mb-0">Recent Discussions</CardTitle>
+          <div className="flex gap-2">
+            {!showFullList && (
+              <Button variant="outline" size="sm" asChild className="flex-grow sm:flex-grow-0">
+                <Link href="/discussions">View All</Link>
+              </Button>
+            )}
+            <Button variant="default" size="sm" className="flex-grow sm:flex-grow-0">
+              Ask a Question
             </Button>
-          )}
-          <Button variant="default" size="sm">
-            Ask a Question
-          </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
